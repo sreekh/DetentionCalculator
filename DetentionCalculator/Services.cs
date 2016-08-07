@@ -8,32 +8,34 @@ using System.Threading.Tasks;
 
 namespace DetentionCalculator.Core.Services
 {
-    public interface ICRUDService<T>
-        where T : IDEntity
+    public interface ICRUDService<T,I>
+        where T : DEntity, new()
+        where I : IDEntity
     {
-        List<T> Get();
-        T Get(Guid id);
-        void Add(T entity);
-        void AddList(List<T> entityList);
+        IDEntityList<T,I> Get();
+        I Get(Guid id);
+        void Add(I entity);
+        void AddList(List<I> entityList);
     }
-    public class OffenceService : ICRUDService<IOffence>
+    public interface IOffenceCRUDService : ICRUDService<Offence, IOffence> { }
+    public class OffenceService : IOffenceCRUDService
     {
         private IRepository Repository;
         public OffenceService(IRepository repository)
         {
             this.Repository = repository;
         }
-        List<IOffence> ICRUDService<IOffence>.Get()
+        IDEntityList<Offence, IOffence> ICRUDService<Offence, IOffence>.Get()
         {
-            return this.Repository.OffenceList.InternalList.Select(o => (IOffence)o).ToList();
+            return this.Repository.OffenceList;
         }
 
-        IOffence ICRUDService<IOffence>.Get(Guid id)
+        IOffence ICRUDService<Offence, IOffence>.Get(Guid id)
         {
             return this.Repository.OffenceList.InternalList.Where(o => o.Id == id).Select(o => (IOffence)o).First();
         }
 
-        void ICRUDService<IOffence>.Add(IOffence entity)
+        void ICRUDService<Offence, IOffence>.Add(IOffence entity)
         {
             this.Repository.OffenceList.InternalList.Add(entity);
         }
@@ -43,24 +45,25 @@ namespace DetentionCalculator.Core.Services
             this.Repository.OffenceList.InternalList.AddRange(entityList);
         }
     }
-    public class StandardDetentionForOffenceService : ICRUDService<IStandardDetentionForOffence>
+    public interface IStandardDetentionForOffenceCRUDService : ICRUDService<StandardDetentionForOffence, IStandardDetentionForOffence> { }
+    public class StandardDetentionForOffenceService : IStandardDetentionForOffenceCRUDService
     {
         private IRepository Repository;
         public StandardDetentionForOffenceService(IRepository repository)
         {
             this.Repository = repository;
         }
-        List<IStandardDetentionForOffence> ICRUDService<IStandardDetentionForOffence>.Get()
+        IDEntityList<StandardDetentionForOffence, IStandardDetentionForOffence> ICRUDService<StandardDetentionForOffence, IStandardDetentionForOffence>.Get()
         {
-            return this.Repository.StandardDetentionForOffenceList.InternalList.Select(o => (IStandardDetentionForOffence)o).ToList();
+            return this.Repository.StandardDetentionForOffenceList;
         }
 
-        IStandardDetentionForOffence ICRUDService<IStandardDetentionForOffence>.Get(Guid id)
+        IStandardDetentionForOffence ICRUDService<StandardDetentionForOffence, IStandardDetentionForOffence>.Get(Guid id)
         {
             return this.Repository.StandardDetentionForOffenceList.InternalList.Where(o => o.Id == id).Select(o => (IStandardDetentionForOffence)o).First();
         }
 
-        void ICRUDService<IStandardDetentionForOffence>.Add(IStandardDetentionForOffence entity)
+        void ICRUDService<StandardDetentionForOffence, IStandardDetentionForOffence>.Add(IStandardDetentionForOffence entity)
         {
             this.Repository.StandardDetentionForOffenceList.InternalList.Add(entity);
         }
