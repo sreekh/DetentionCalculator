@@ -1,4 +1,5 @@
-﻿using DetentionCalculator.Core.Entities;
+﻿using DetentionCalculator.Core.Databases;
+using DetentionCalculator.Core.Entities;
 using DetentionCalculator.Core.Processors;
 using Ninject.Modules;
 

@@ -5,7 +5,7 @@ using DetentionCalculator.Core.Entities;
 using System.IO;
 using Newtonsoft.Json;
 
-namespace DetentionCalculator.Core
+namespace DetentionCalculator.Core.Databases
 {
     public interface IRepository
     {
@@ -27,6 +27,7 @@ namespace DetentionCalculator.Core
 
         void DiscardChanges();
     }
+
     public class LocalRepository : IRepository
     {
         private const string LOCAL_FILE_DIRECTORY_PATH = @"C:\Temp\DetentionCalculator";
@@ -128,6 +129,7 @@ namespace DetentionCalculator.Core
                 throw new InvalidDataException("Seed data not initialized");
         }
     }
+
     internal class SeedDataProvider : IRepository
     {
         internal void SetSeedData()
