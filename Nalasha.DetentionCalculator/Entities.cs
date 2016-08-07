@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Nalasha.DetentionCalculator.Core.Entities
+namespace DetentionCalculator.Core.Entities
 {
     public interface IDEntity
     {

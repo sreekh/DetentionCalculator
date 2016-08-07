@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Nalasha.DetentionCalculator.Core.Entities;
+using DetentionCalculator.Core.Entities;
 
-namespace Nalasha.DetentionCalculator.Core.Processors
+namespace DetentionCalculator.Core.Processors
 {
     public interface IDetentionCalculator
     {

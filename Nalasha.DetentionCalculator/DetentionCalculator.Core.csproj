@@ -7,8 +7,8 @@
     <ProjectGuid>{836FECB7-C9BD-4F36-BCE7-CB7C89A4F0C8}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Nalasha.DetentionCalculator.Core</RootNamespace>
-    <AssemblyName>Nalasha.DetentionCalculator.Core</AssemblyName>
+    <RootNamespace>DetentionCalculator.Core</RootNamespace>
+    <AssemblyName>DetentionCalculator.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
