@@ -13,6 +13,14 @@ namespace DetentionCalculator.Core.Entities
     }
     public class DEntity : IDEntity
     {
+        public DEntity()
+        {
+            this.Id = Guid.NewGuid();
+            this.Created = DateTime.UtcNow;
+            this.Modified = DateTime.UtcNow;
+            this.CreatedBy = "system";
+            this.ModifiedBy = "system";
+        }
         public Guid Id { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Modified { get; set; }
@@ -120,12 +128,12 @@ namespace DetentionCalculator.Core.Entities
     public interface IDetentionForOffence
     {
         IOffence Offence { get; set; }
-        float DetentionInHours { get; set; }
+        double DetentionInHours { get; set; }
     }
     public class DetentionForOffence : IDetentionForOffence
     {
         public IOffence Offence { get; set; }
-        public float DetentionInHours { get; set; }
+        public double DetentionInHours { get; set; }
     }
     public interface IStandardDetentionForOffence : IDEntity, IDetentionForOffence
     {
@@ -133,7 +141,7 @@ namespace DetentionCalculator.Core.Entities
     public class StandardDetentionForOffence : DEntity, IStandardDetentionForOffence
     {
         public IOffence Offence { get; set; }
-        public float DetentionInHours { get; set; }
+        public double DetentionInHours { get; set; }
     }
     public interface IStudentOffence : IDEntity
     {
@@ -152,7 +160,7 @@ namespace DetentionCalculator.Core.Entities
     public interface IStudentDetention : IDEntity
     {
         IStudentOffence StudentOffence { get; set; }
-        float DetentionInHours { get; set; }
+        double DetentionInHours { get; set; }
         DateTime DetentionStartTime { get; set; }
         DateTime DetentionEndTime { get; set; }
         DateTime? DetentionActualStartTime { get; set; }
@@ -162,7 +170,7 @@ namespace DetentionCalculator.Core.Entities
     public class StudentDetention : DEntity, IStudentDetention
     {
         public IStudentOffence StudentOffence { get; set; }
-        public float DetentionInHours { get; set; }
+        public double DetentionInHours { get; set; }
         public DateTime DetentionStartTime { get; set; }
         public DateTime DetentionEndTime { get; set; }
         public DateTime? DetentionActualStartTime { get; set; }
