@@ -18,7 +18,30 @@ namespace DetentionCalculator.Core.Processors
         public ICalculateDetentionResponse Calculate(ICalculateDetentionRequest request)
         {
             throw new NotImplementedException();
+            List<DetentionForOffence> initialDetentionList = new List<DetentionForOffence>();
+            if(request != null)
+            {
+                var detentionRules = GetDetentionRules();
+                var standardDetentions = GetStandardDetentions();
+                if (detentionRules != null && detentionRules.Count() > 0)
+                {
+                    detentionRules.ToList().ForEach(dr => initialDetentionList.AddRange(dr.GetDetention(request.Offences, standardDetentions)));
+                }
+
+                var orchestrationStrategies = GetOrchestrationStrategies(request.RuleCalculationMode);
+                if(orchestrationStrategies != null && orchestrationStrategies.Count() > 0)
+                {
+                    orchestrationStrategies.ToList().ForEach(os => initialDetentionList = os.FinalizeDetention(initialDetentionList));
+                }
+            }
+            
         }
+
+        private IEnumerable<IStandardDetentionForOffence> GetStandardDetentions()
+        {
+            throw new NotImplementedException();
+        }
+
         private IEnumerable<IDetentionRule> GetDetentionRules()
         {
             var interfaceType = typeof(IDetentionRule);
@@ -38,16 +61,19 @@ namespace DetentionCalculator.Core.Processors
                         && !x.IsInterface
                         && !x.IsAbstract
                         && ((IRuleOrchestrationStrategy)x).ApplyStrategy(ruleCalculationMode))
-              .Select(x => (IRuleOrchestrationStrategy)Activator.CreateInstance(x));
+              .Select(x => (IRuleOrchestrationStrategy)Activator.CreateInstance(x)).OrderBy(x => x.OrchestrationOrder);
         }
     }
     public interface IRuleOrchestrationStrategy
     {
         bool ApplyStrategy(IRuleCalculationMode ruleCalculationMode);
+        short OrchestrationOrder { get; }
         List<DetentionForOffence> FinalizeDetention(List<DetentionForOffence> detentions);
     }
     public class ConcurrentRuleStrategy : IRuleOrchestrationStrategy
     {
+        public short OrchestrationOrder { get { return 1; } }
+
         public bool ApplyStrategy(IRuleCalculationMode ruleCalculationMode)
         {
             return ruleCalculationMode != null
@@ -64,13 +90,14 @@ namespace DetentionCalculator.Core.Processors
             //Currently below I am using approach 2
             if (detentions != null && detentions.Count > 0)
             {
-                return (detentions.OrderByDescending(d => d.DetentionInHours).Take(1).ToList());
+                return (detentions.Where(d => d != null).OrderByDescending(d => d.DetentionInHours).Take(1).ToList());
             }
             return detentions;
         }
     }
     public class ConsecutiveRuleStrategy : IRuleOrchestrationStrategy
     {
+        public short OrchestrationOrder { get { return 0; } }
         public bool ApplyStrategy(IRuleCalculationMode ruleCalculationMode)
         {
             return ruleCalculationMode != null
@@ -80,23 +107,23 @@ namespace DetentionCalculator.Core.Processors
         {
             if (detentions != null && detentions.Count > 0)
             {
-                return (detentions.GroupBy(detention => detention.Offence).Select(group => new DetentionForOffence { Offence = group.Key, DetentionInHours = group.Sum(detention => detention.DetentionInHours) }).ToList<DetentionForOffence>());
+                return (detentions.Where(d => d != null).GroupBy(detention => detention.Offence).Select(group => new DetentionForOffence { Offence = group.Key, DetentionInHours = group.Sum(detention => detention.DetentionInHours) }).ToList<DetentionForOffence>());
             }
             return detentions;
         }
     }
     public interface IDetentionRule
     {
-        IEnumerable<DetentionForOffence> GetDetention(List<IOffence> offences, System.Collections.Generic.IEnumerable<IStandardDetentionForOffence> standardDetentions);
+        IEnumerable<DetentionForOffence> GetDetention(IEnumerable<IOffence> offences, System.Collections.Generic.IEnumerable<IStandardDetentionForOffence> standardDetentions);
     }
     public abstract class BaseDetentionRule : IDetentionRule
     {
-        public virtual IEnumerable<DetentionForOffence> GetDetention(List<IOffence> offences, System.Collections.Generic.IEnumerable<IStandardDetentionForOffence> standardDetentions)
+        public virtual IEnumerable<DetentionForOffence> GetDetention(IEnumerable<IOffence> offences, System.Collections.Generic.IEnumerable<IStandardDetentionForOffence> standardDetentions)
         {
             System.Collections.Generic.List<DetentionForOffence> detentionList = new System.Collections.Generic.List<DetentionForOffence>();
-            if (offences != null && offences.Count > 0)
+            if (offences != null && offences.Count() > 0)
             {
-                offences.ForEach(offence => detentionList.Add(new DetentionForOffence { Offence = offence, DetentionInHours = standardDetentions.Where(sd => sd.Offence.Id == offence.Id).FirstOrDefault().DetentionInHours }));
+                offences.ToList().ForEach(offence => detentionList.Add(new DetentionForOffence { Offence = offence, DetentionInHours = standardDetentions.Where(sd => sd.Offence.Id == offence.Id).FirstOrDefault().DetentionInHours }));
             }
             return detentionList;
         }
@@ -104,7 +131,7 @@ namespace DetentionCalculator.Core.Processors
     public abstract class PercentageDetentionRule : BaseDetentionRule, IDetentionRule
     {
         protected virtual int PercentageValue { get; }
-        public virtual IEnumerable<DetentionForOffence> ModifyDetention(List<IOffence> offences, System.Collections.Generic.IEnumerable<IStandardDetentionForOffence> standardDetentions)
+        public virtual IEnumerable<DetentionForOffence> ModifyDetention(IEnumerable<IOffence> offences, System.Collections.Generic.IEnumerable<IStandardDetentionForOffence> standardDetentions)
         {
             System.Collections.Generic.List<DetentionForOffence> detentionList = new System.Collections.Generic.List<DetentionForOffence>(base.GetDetention(offences, standardDetentions));
             if (detentionList != null && detentionList.Count > 0)
@@ -117,9 +144,9 @@ namespace DetentionCalculator.Core.Processors
     public class GoodStudentDetentionRule : PercentageDetentionRule, IDetentionRule
     {
         protected override int PercentageValue { get { return Constants.GoodStudentDetentionRebatePercentage; } }
-        public override IEnumerable<DetentionForOffence> ModifyDetention(List<IOffence> offences, IEnumerable<IStandardDetentionForOffence> standardDetentions)
+        public override IEnumerable<DetentionForOffence> ModifyDetention(IEnumerable<IOffence> offences, IEnumerable<IStandardDetentionForOffence> standardDetentions)
         {
-            if (offences != null && offences.Count == 1)
+            if (offences != null && offences.Count() == 1)
             {
                 return base.ModifyDetention(offences, standardDetentions);
             }
@@ -128,10 +155,10 @@ namespace DetentionCalculator.Core.Processors
     }
     public class BadStudentDetentionRule : PercentageDetentionRule, IDetentionRule
     {
-        protected override int PercentageValue { get { return Nalasha.DetentionCalculator.Core.Processors.Constants.BadStudentDetentionSurplusPercentage; } }
-        public override IEnumerable<DetentionForOffence> ModifyDetention(List<IOffence> offences, IEnumerable<IStandardDetentionForOffence> standardDetentions)
+        protected override int PercentageValue { get { return Constants.BadStudentDetentionSurplusPercentage; } }
+        public override IEnumerable<DetentionForOffence> ModifyDetention(IEnumerable<IOffence> offences, IEnumerable<IStandardDetentionForOffence> standardDetentions)
         {
-            if (offences != null && offences.Count > 1)
+            if (offences != null && offences.Count() > 1)
             {
                 return base.ModifyDetention(offences, standardDetentions);
             }

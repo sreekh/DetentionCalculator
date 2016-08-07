@@ -54,6 +54,11 @@ namespace DetentionCalculator.Core.Entities
         IStandard Standard { get; set; }
         string Section { get; set; }
     }
+    public class ClassRoom : DEntity, IClassRoom
+    {
+        public IStandard Standard { get; set; }
+        public string Section { get; set; }
+    }
     public enum FacultyType : short
     {
         Teaching = 0,
@@ -168,6 +173,10 @@ namespace DetentionCalculator.Core.Entities
     {
         RuleCalculationModeType CalculationType { get; set; }
     }
+    public class RuleCalculationMode : DEntity, IRuleCalculationMode
+    {
+        public RuleCalculationModeType CalculationType { get; set; }
+    }
     public enum RuleCalculationModeType : short
     {
         Concurrent = 0,
@@ -176,6 +185,7 @@ namespace DetentionCalculator.Core.Entities
     public interface ICalculateDetentionRequest : IDEntity
     {
         IStudent Student { get; set; }
+        IEnumerable<IOffence> Offences { get; set; }
         IRuleCalculationMode RuleCalculationMode { get; set; }
         DateTime DetentionStartTime { get; set; }
         IFaculty RequestingFaculty { get; set; }
@@ -183,6 +193,7 @@ namespace DetentionCalculator.Core.Entities
     public class CalculateDetentionRequest : DEntity, ICalculateDetentionRequest
     {
         public IStudent Student { get; set; }
+        public IEnumerable<IOffence> Offences { get; set; }
         public IRuleCalculationMode RuleCalculationMode { get; set; }
         public DateTime DetentionStartTime { get; set; }
         public IFaculty RequestingFaculty { get; set; }
