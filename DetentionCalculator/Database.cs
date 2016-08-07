@@ -9,9 +9,9 @@ namespace DetentionCalculator.Core.Databases
 {
     public interface IRepository
     {
-        List<StandardDetentionForOffence> StandardDetentionForOffenceList { get;}
+        StandardDetentionForOffenceList StandardDetentionForOffenceList { get;}
 
-        List<Offence> OffenceList { get; }
+        OffenceList OffenceList { get; }
 
         List<Student> StudentList { get; }
 
@@ -70,7 +70,7 @@ namespace DetentionCalculator.Core.Databases
             }
         }
 
-        public List<Offence> OffenceList
+        public OffenceList OffenceList
         {
             get
             {
@@ -78,7 +78,7 @@ namespace DetentionCalculator.Core.Databases
             }
         }
 
-        public List<StandardDetentionForOffence> StandardDetentionForOffenceList
+        public StandardDetentionForOffenceList StandardDetentionForOffenceList
         {
             get
             {
@@ -134,20 +134,20 @@ namespace DetentionCalculator.Core.Databases
     {
         internal void SetSeedData()
         {
-            this.StandardDetentionForOffenceList = new List<StandardDetentionForOffence>();
-            this.StandardDetentionForOffenceList.Add(new StandardDetentionForOffence { DetentionInHours = 1, Offence = new Offence { Code = "Homework not done", Description = "Homework not done." } });
-            this.StandardDetentionForOffenceList.Add(new StandardDetentionForOffence { DetentionInHours = 2, Offence = new Offence { Code = "Stealing", Description = "Stealing." } });
-            this.StandardDetentionForOffenceList.Add(new StandardDetentionForOffence { DetentionInHours = 0.5, Offence = new Offence { Code = "Fighting", Description = "Fighting." } });
-            this.StandardDetentionForOffenceList.Add(new StandardDetentionForOffence { DetentionInHours = 1, Offence = new Offence { Code = "Untidyness", Description = "Untidyness." } });
-            this.StandardDetentionForOffenceList.Add(new StandardDetentionForOffence { DetentionInHours = 1.5, Offence = new Offence { Code = "Lying", Description = "Lying." } });
-            this.StandardDetentionForOffenceList.Add(new StandardDetentionForOffence { DetentionInHours = 1, Offence = new Offence { Code = "School Property Damage", Description = "Damaging school property." } });
+            this.StandardDetentionForOffenceList = new StandardDetentionForOffenceList();
+            this.StandardDetentionForOffenceList.InternalList.Add(new StandardDetentionForOffence { DetentionInHours = 1, Offence = new Offence { Code = "Homework not done", Description = "Homework not done." } });
+            this.StandardDetentionForOffenceList.InternalList.Add(new StandardDetentionForOffence { DetentionInHours = 2, Offence = new Offence { Code = "Stealing", Description = "Stealing." } });
+            this.StandardDetentionForOffenceList.InternalList.Add(new StandardDetentionForOffence { DetentionInHours = 0.5, Offence = new Offence { Code = "Fighting", Description = "Fighting." } });
+            this.StandardDetentionForOffenceList.InternalList.Add(new StandardDetentionForOffence { DetentionInHours = 1, Offence = new Offence { Code = "Untidyness", Description = "Untidyness." } });
+            this.StandardDetentionForOffenceList.InternalList.Add(new StandardDetentionForOffence { DetentionInHours = 1.5, Offence = new Offence { Code = "Lying", Description = "Lying." } });
+            this.StandardDetentionForOffenceList.InternalList.Add(new StandardDetentionForOffence { DetentionInHours = 1, Offence = new Offence { Code = "School Property Damage", Description = "Damaging school property." } });
 
-            this.OffenceList = this.StandardDetentionForOffenceList.Select(s => (Offence)s.Offence).ToList();
+            this.OffenceList = new OffenceList(this.StandardDetentionForOffenceList.InternalList.Select(s => s.Offence));
         }
 
-        public List<StandardDetentionForOffence> StandardDetentionForOffenceList { get; set; }
+        public StandardDetentionForOffenceList StandardDetentionForOffenceList { get; set; }
         
-        public List<Offence> OffenceList { get; set; }
+        public OffenceList OffenceList { get; set; }
 
         public List<Student> StudentList { get; set; }
 

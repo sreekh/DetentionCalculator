@@ -21,12 +21,71 @@ namespace DetentionCalculator.Core.Entities
             this.CreatedBy = "system";
             this.ModifiedBy = "system";
         }
+        public DEntity(IDEntity entity)
+        {
+            if(entity != null)
+            {
+                this.Id = entity.Id;
+                this.Created = entity.Created;
+                this.Modified = entity.Modified;
+                this.CreatedBy = !string.IsNullOrWhiteSpace(entity.CreatedBy) ? "system" : entity.CreatedBy;
+                this.ModifiedBy = !string.IsNullOrWhiteSpace(entity.ModifiedBy) ? "system" : entity.ModifiedBy;
+            }
+            
+        }
         public Guid Id { get; set; }
         public DateTime Created { get; set; }
         public DateTime? Modified { get; set; }
         public string CreatedBy { get; set; }
         public string ModifiedBy { get; set; }
     }
+    public interface IDEntityList<T,I>
+        where T : DEntity, new()
+        where I : IDEntity
+    {
+        List<I> InternalList { get; set; }
+    }
+    public class DEntityList : List<DEntity>, IDEntityList<DEntity,IDEntity>
+    {
+        private List<IDEntity> internalList;
+        public DEntityList() { }
+        public DEntityList(List<IDEntity> internalList)  { this.internalList = internalList; }
+        public DEntityList(IEnumerable<DEntity> internalList) : base(internalList){  }
+        public List<IDEntity> InternalList
+        {
+            get
+            {
+                return this.internalList;
+            }
+
+            set
+            {
+                this.internalList = value;
+            }
+        }
+    }
+    public class DEntityList<T,I> : IDEntityList<T,I>
+        where T : DEntity, new()
+        where I : IDEntity
+    {
+        private List<I> internalList;
+        public DEntityList() { this.internalList = new List<I>(); }
+        public DEntityList(List<I> internalList) { this.internalList = internalList; }
+        public DEntityList(IEnumerable<I> internalList) { this.internalList = new List<I>(internalList); }
+        public List<I> InternalList
+        {
+            get
+            {
+                return this.internalList;
+            }
+
+            set
+            {
+                this.internalList = value;
+            }
+        }
+    }
+
     public interface IPerson : IDEntity
     {
         string FirstName { get; set; }
@@ -125,6 +184,12 @@ namespace DetentionCalculator.Core.Entities
         public string Code { get; set; }
         public string Description { get; set; }
     }
+    public class OffenceList : DEntityList<Offence, IOffence>, IDEntityList<Offence, IOffence>
+    {
+        public OffenceList() { }
+        public OffenceList(List<IOffence> internalList) : base(internalList) { this.InternalList = internalList; }
+        public OffenceList(IEnumerable<IOffence> internalList) { this.InternalList = new List<IOffence>(internalList); }
+    }
     public interface IDetentionForOffence
     {
         IOffence Offence { get; set; }
@@ -135,6 +200,7 @@ namespace DetentionCalculator.Core.Entities
         public IOffence Offence { get; set; }
         public double DetentionInHours { get; set; }
     }
+    
     public interface IStandardDetentionForOffence : IDEntity, IDetentionForOffence
     {
     }
@@ -142,6 +208,12 @@ namespace DetentionCalculator.Core.Entities
     {
         public IOffence Offence { get; set; }
         public double DetentionInHours { get; set; }
+    }
+    public class StandardDetentionForOffenceList : DEntityList<StandardDetentionForOffence, IStandardDetentionForOffence>, IDEntityList<StandardDetentionForOffence, IStandardDetentionForOffence>
+    {
+        public StandardDetentionForOffenceList() :base() { }
+        public StandardDetentionForOffenceList(List<IStandardDetentionForOffence> internalList) : base(internalList) { this.InternalList = internalList; }
+        public StandardDetentionForOffenceList(IEnumerable<IStandardDetentionForOffence> internalList) { this.InternalList = new List<IStandardDetentionForOffence>(internalList); }
     }
     public interface IStudentOffence : IDEntity
     {
@@ -156,6 +228,12 @@ namespace DetentionCalculator.Core.Entities
         public IOffence Offence { get; set; }
         public DateTime OffenceTime { get; set; }
         public IFaculty ReportingFaculty { get; set; }
+    }
+    public class StudentOffenceList : DEntityList<StudentOffence, IStudentOffence>, IDEntityList<StudentOffence, IStudentOffence>
+    {
+        public StudentOffenceList() { }
+        public StudentOffenceList(List<IStudentOffence> internalList) : base(internalList) { this.InternalList = internalList; }
+        public StudentOffenceList(IEnumerable<IStudentOffence> internalList) { this.InternalList = new List<IStudentOffence>(internalList); }
     }
     public interface IStudentDetention : IDEntity
     {
