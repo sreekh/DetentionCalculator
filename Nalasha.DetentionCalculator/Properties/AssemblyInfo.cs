@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("Nalasha.DetentionCalculator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Oracle Corporation")]
+[assembly: AssemblyCompany("Captain Vyom Fans")]
 [assembly: AssemblyProduct("Nalasha.DetentionCalculator")]
-[assembly: AssemblyCopyright("Copyright © Oracle Corporation 2016")]
+[assembly: AssemblyCopyright("Copyright © Captain Vyom Fans 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
