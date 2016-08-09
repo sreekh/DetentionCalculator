@@ -161,15 +161,48 @@ namespace DetentionCalculator.Core.Databases
             this.StudentList = new StudentList();
             this.StudentList.InternalList.Add(new Student
             {
+                PersonalDetails = new Person { FirstName = "Joey", LastName = "McDonald", DateOfBirth = new DateTime(2010, 03, 01) },
+                AcedemicYear = new DateTime(2016, 01, 01),
+                IsActive = true,
+                ClassRoom = new ClassRoom { Section = "A", Standard = new Standard { Type = StandardType.LowerKindergarten } },
+                RollNumber = "001"
+            });
+            this.StudentList.InternalList.Add(new Student
+            {
+                PersonalDetails = new Person { FirstName = "Margaret", LastName = "Wade", DateOfBirth = new DateTime(2010, 02, 01) },
+                AcedemicYear = new DateTime(2016, 01, 01),
+                IsActive = true,
+                ClassRoom = new ClassRoom { Section = "A", Standard = new Standard { Type = StandardType.LowerKindergarten } },
+                RollNumber = "002"
+            });
+            this.StudentList.InternalList.Add(new Student
+            {
                 PersonalDetails = new Person { FirstName = "Dennis", LastName = "Mitchel", DateOfBirth = new DateTime(2010, 01, 01) },
                 AcedemicYear = new DateTime(2016, 01, 01),
                 IsActive = true,
                 ClassRoom = new ClassRoom { Section = "A", Standard = new Standard { Type = StandardType.LowerKindergarten } },
-                RollNumber = "012"
+                RollNumber = "003"
+            });
+            this.StudentList.InternalList.Add(new Student
+            {
+                PersonalDetails = new Person { FirstName = "Cowboy", LastName = "Bob", DateOfBirth = new DateTime(2010, 05, 01) },
+                AcedemicYear = new DateTime(2016, 01, 01),
+                IsActive = true,
+                ClassRoom = new ClassRoom { Section = "A", Standard = new Standard { Type = StandardType.LowerKindergarten } },
+                RollNumber = "004"
             });
             this.StudentDetentionList = new StudentDetentionList();
             this.StudentOffenceList = new StudentOffenceList();
-            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
+            this.StudentOffenceList.Add(new StudentOffence { Student = this.StudentList.InternalList.ElementAt(1), Offence = this.OffenceList.InternalList.ElementAt(4), ReportingFaculty = this.FacultyList.InternalList.ElementAt(0) });            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
+
+            this.StudentOffenceList.Add(new StudentOffence { Student = this.StudentList.InternalList.ElementAt(2), Offence = this.OffenceList.InternalList.ElementAt(0), ReportingFaculty = this.FacultyList.InternalList.ElementAt(0) });            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
+            this.StudentOffenceList.Add(new StudentOffence { Student = this.StudentList.InternalList.ElementAt(2), Offence = this.OffenceList.InternalList.ElementAt(1), ReportingFaculty = this.FacultyList.InternalList.ElementAt(0) });            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
+
+            this.StudentOffenceList.Add(new StudentOffence { Student = this.StudentList.InternalList.ElementAt(3), Offence = this.OffenceList.InternalList.ElementAt(1), ReportingFaculty = this.FacultyList.InternalList.ElementAt(0) });            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
+            this.StudentOffenceList.Add(new StudentOffence { Student = this.StudentList.InternalList.ElementAt(3), Offence = this.OffenceList.InternalList.ElementAt(1), ReportingFaculty = this.FacultyList.InternalList.ElementAt(0) });            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
+            this.StudentOffenceList.Add(new StudentOffence { Student = this.StudentList.InternalList.ElementAt(3), Offence = this.OffenceList.InternalList.ElementAt(1), ReportingFaculty = this.FacultyList.InternalList.ElementAt(0) });            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
+            this.StudentOffenceList.Add(new StudentOffence { Student = this.StudentList.InternalList.ElementAt(3), Offence = this.OffenceList.InternalList.ElementAt(1), ReportingFaculty = this.FacultyList.InternalList.ElementAt(0) });            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
+            this.StudentOffenceList.Add(new StudentOffence { Student = this.StudentList.InternalList.ElementAt(3), Offence = this.OffenceList.InternalList.ElementAt(1), ReportingFaculty = this.FacultyList.InternalList.ElementAt(0) });            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
         }
 
         public StandardDetentionForOffenceList StandardDetentionForOffenceList { get; set; }
