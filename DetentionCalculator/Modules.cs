@@ -1,6 +1,7 @@
 ﻿using DetentionCalculator.Core.Databases;
 using DetentionCalculator.Core.Entities;
 using DetentionCalculator.Core.Processors;
+using DetentionCalculator.Core.Services;
 using Ninject.Modules;
 
 namespace DetentionCalculator.Core
@@ -10,6 +11,7 @@ namespace DetentionCalculator.Core
         public override void Load()
         {
             BindEntities();
+            BindServices();
             BindRepositories();
             BindProcessors();
         }
@@ -29,10 +31,22 @@ namespace DetentionCalculator.Core
             Bind<IRuleCalculationMode>().To<RuleCalculationMode>();
             Bind<ICalculateDetentionRequest>().To<CalculateDetentionRequest>();
             Bind<ICalculateDetentionResponse>().To<CalculateDetentionResponse>();
+
+            Bind<IDetentionForOffenceToCalculateDetentionResponseConverter>().To<DetentionForOffenceToCalculateDetentionResponseConverter>();
         }
         private void BindRepositories()
         {
             Bind<IRepository>().To<LocalRepository>().InSingletonScope();
+        }
+        private void BindServices()
+        {
+            Bind<IOffenceCRUDService>().To<OffenceService>();
+            Bind<IStandardDetentionForOffenceCRUDService>().To<StandardDetentionForOffenceService>();
+            Bind<IStudentCRUDService>().To<StudentService>();
+            Bind<IFacultyCRUDService>().To<FacultyService>();
+            Bind<IStudentOffenceCRUDService>().To<StudentOffenceService>();
+            Bind<IStudentDetentionCRUDService>().To<StudentDetentionService>();
+            Bind<ICalculateDetentionRequestCRUDService>().To<CalculateDetentionRequestService>();
         }
         private void BindProcessors()
         {

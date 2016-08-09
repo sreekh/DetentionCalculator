@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DetentionCalculator.Core")]
+[assembly: AssemblyTitle("DetentionCalculator.TestingConsole")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Captain Vyom Fans")]
-[assembly: AssemblyProduct("DetentionCalculator.Core")]
+[assembly: AssemblyProduct("DetentionCalculator.TestingConsole")]
 [assembly: AssemblyCopyright("Copyright © Captain Vyom Fans 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("836fecb7-c9bd-4f36-bce7-cb7c89a4f0c8")]
+[assembly: Guid("88120861-2622-4410-912c-3d9513e5f9da")]
 
 // Version information for an assembly consists of the following four values:
 //

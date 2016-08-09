@@ -13,15 +13,15 @@ namespace DetentionCalculator.Core.Databases
 
         OffenceList OffenceList { get; }
 
-        List<Student> StudentList { get; }
+        StudentList StudentList { get; }
 
-        List<Faculty> FacultyList { get; }
+        FacultyList FacultyList { get; }
 
-        List<StudentOffence> StudentOffenceList { get; }
+        StudentOffenceList StudentOffenceList { get; }
 
-        List<StudentDetention> StudentDetentionList { get; }
+        StudentDetentionList StudentDetentionList { get; }
 
-        List<CalculateDetentionRequest> CalculateDetentionRequestList { get; }
+        CalculateDetentionRequestList CalculateDetentionRequestList { get; }
 
         void SaveChanges();
 
@@ -54,7 +54,7 @@ namespace DetentionCalculator.Core.Databases
             DiscardChanges();
         }
 
-        public List<CalculateDetentionRequest> CalculateDetentionRequestList
+        public CalculateDetentionRequestList CalculateDetentionRequestList
         {
             get
             {
@@ -62,7 +62,7 @@ namespace DetentionCalculator.Core.Databases
             }
         }
 
-        public List<Faculty> FacultyList
+        public FacultyList FacultyList
         {
             get
             {
@@ -86,7 +86,7 @@ namespace DetentionCalculator.Core.Databases
             }
         }
 
-        public List<StudentDetention> StudentDetentionList
+        public StudentDetentionList StudentDetentionList
         {
             get
             {
@@ -94,7 +94,7 @@ namespace DetentionCalculator.Core.Databases
             }
         }
 
-        public List<Student> StudentList
+        public StudentList StudentList
         {
             get
             {
@@ -102,7 +102,7 @@ namespace DetentionCalculator.Core.Databases
             }
         }
 
-        public List<StudentOffence> StudentOffenceList
+        public StudentOffenceList StudentOffenceList
         {
             get
             {
@@ -143,21 +143,48 @@ namespace DetentionCalculator.Core.Databases
             this.StandardDetentionForOffenceList.InternalList.Add(new StandardDetentionForOffence { DetentionInHours = 1, Offence = new Offence { Code = "School Property Damage", Description = "Damaging school property." } });
 
             this.OffenceList = new OffenceList(this.StandardDetentionForOffenceList.InternalList.Select(s => s.Offence));
+
+            this.FacultyList = new FacultyList();
+            this.FacultyList.InternalList.Add(new Faculty
+            {
+                PersonalDetails = new Person
+                {
+                    FirstName = "George",
+                    LastName = "Wilson",
+                    DateOfBirth = new DateTime(1950, 01, 01)
+                },
+                DateOfJoining = new DateTime(2010, 01, 01),
+                FacultyId = "E00100",
+                FacultyType = FacultyType.Administration,
+                IsInService = true
+            });
+            this.StudentList = new StudentList();
+            this.StudentList.InternalList.Add(new Student
+            {
+                PersonalDetails = new Person { FirstName = "Dennis", LastName = "Mitchel", DateOfBirth = new DateTime(2010, 01, 01) },
+                AcedemicYear = new DateTime(2016, 01, 01),
+                IsActive = true,
+                ClassRoom = new ClassRoom { Section = "A", Standard = new Standard { Type = StandardType.LowerKindergarten } },
+                RollNumber = "012"
+            });
+            this.StudentDetentionList = new StudentDetentionList();
+            this.StudentOffenceList = new StudentOffenceList();
+            this.CalculateDetentionRequestList = new CalculateDetentionRequestList();
         }
 
         public StandardDetentionForOffenceList StandardDetentionForOffenceList { get; set; }
         
         public OffenceList OffenceList { get; set; }
 
-        public List<Student> StudentList { get; set; }
+        public StudentList StudentList { get; set; }
 
-        public List<Faculty> FacultyList { get; set; }
+        public FacultyList FacultyList { get; set; }
 
-        public List<StudentOffence> StudentOffenceList { get; set; }
+        public StudentOffenceList StudentOffenceList { get; set; }
 
-        public List<StudentDetention> StudentDetentionList { get; set; }
+        public StudentDetentionList StudentDetentionList { get; set; }
 
-        public List<CalculateDetentionRequest> CalculateDetentionRequestList { get; set; }
+        public CalculateDetentionRequestList CalculateDetentionRequestList { get; set; }
 
         public void SaveChanges()
         {

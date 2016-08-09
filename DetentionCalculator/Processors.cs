@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using DetentionCalculator.Core.Entities;
-using DetentionCalculator.Core.Databases;
 using DetentionCalculator.Core.Services;
 
 namespace DetentionCalculator.Core.Processors
@@ -14,22 +13,28 @@ namespace DetentionCalculator.Core.Processors
     public class DetentionCalculator : IDetentionCalculator
     {
         private IStandardDetentionForOffenceCRUDService StandardDetentionForOffenceService;
+        private IStudentOffenceCRUDService StudentOffenceCRUDService;
+        private IDetentionForOffenceToCalculateDetentionResponseConverter DetentionForOffenceToCalculateDetentionResponseConverter;
 
-        public DetentionCalculator(IStandardDetentionForOffenceCRUDService standardDetentionForOffenceService)
+        public DetentionCalculator(IStandardDetentionForOffenceCRUDService standardDetentionForOffenceCRUDService,
+             IStudentOffenceCRUDService studentOffenceCRUDService, IDetentionForOffenceToCalculateDetentionResponseConverter detentionForOffenceToCalculateDetentionResponseConverter)
         {
-            this.StandardDetentionForOffenceService = standardDetentionForOffenceService;
+            this.StandardDetentionForOffenceService = standardDetentionForOffenceCRUDService;
+            this.StudentOffenceCRUDService = studentOffenceCRUDService;
+            this.DetentionForOffenceToCalculateDetentionResponseConverter = detentionForOffenceToCalculateDetentionResponseConverter;
         }
         public ICalculateDetentionResponse Calculate(ICalculateDetentionRequest request)
         {
-            throw new NotImplementedException();
             List<DetentionForOffence> initialDetentionList = new List<DetentionForOffence>();
             if(request != null)
             {
                 var detentionRules = GetDetentionRules();
                 var standardDetentions = this.StandardDetentionForOffenceService.Get();
-                if (detentionRules != null && detentionRules.Count() > 0)
+                var studentOffences = this.StudentOffenceCRUDService.Get(request.Student);
+                if (detentionRules != null && detentionRules.Count() > 0 && studentOffences != null && studentOffences.InternalList.Count > 0)
                 {
-                    detentionRules.ToList().ForEach(dr => initialDetentionList.AddRange(dr.GetDetention(request.Offences, standardDetentions)));
+                    var offenceList = studentOffences.InternalList.Select(so => so.Offence);
+                    detentionRules.ToList().ForEach(dr => initialDetentionList.AddRange(dr.GetDetention(offenceList, standardDetentions)));
                 }
 
                 var orchestrationStrategies = GetOrchestrationStrategies(request.RuleCalculationMode);
@@ -38,7 +43,10 @@ namespace DetentionCalculator.Core.Processors
                     orchestrationStrategies.ToList().ForEach(os => initialDetentionList = os.FinalizeDetention(initialDetentionList));
                 }
             }
-            
+                var response = this.DetentionForOffenceToCalculateDetentionResponseConverter.Convert(initialDetentionList, request);
+            if (response != null && response.DetentionPeriodInHours > Convert.ToInt32(Constants.DetentionPeriodLimitForADay))
+                throw new DetentionExceedsDayLimitException(response);
+            return response;
         }
 
         private IEnumerable<IDetentionRule> GetDetentionRules()
@@ -164,10 +172,13 @@ namespace DetentionCalculator.Core.Processors
             else return null;
         }
     }
+    //// Ideally Move these to a configuration table
     internal static class Constants
     {
         public const int BadStudentDetentionSurplusPercentage = 10;
         public const int GoodStudentDetentionRebatePercentage = -10;
+
+        public const int DetentionPeriodLimitForADay = 8; 
     }
 
 }

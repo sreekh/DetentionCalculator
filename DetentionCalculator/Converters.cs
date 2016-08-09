@@ -7,21 +7,23 @@ using System.Threading.Tasks;
 
 namespace DetentionCalculator.Core
 {
-    public interface IBaseConverter<S, D>
+    public interface IDetentionForOffenceToCalculateDetentionResponseConverter
     {
-        D Convert(S source);
+        ICalculateDetentionResponse Convert(IEnumerable<DetentionForOffence> detentionForOffenceList, ICalculateDetentionRequest request);
     }
-    public class DetentionForOffenceToStudentDetentionConverter : IBaseConverter<ICalculateDetentionResponse, IEnumerable<IStudentDetention>>
+    public  class DetentionForOffenceToCalculateDetentionResponseConverter : IDetentionForOffenceToCalculateDetentionResponseConverter
     {
-        public IEnumerable<IStudentDetention> Convert(ICalculateDetentionResponse source)
+        public ICalculateDetentionResponse Convert(IEnumerable<DetentionForOffence> detentionForOffenceList, ICalculateDetentionRequest request)
         {
-            if(source != null && source.CalculateDetentionRequest != null && source.DetentionList != null && source.DetentionList.Count > 0)
+            if (request != null && detentionForOffenceList != null && detentionForOffenceList.Count() > 0)
             {
-                DateTime detentionStartTime = source.CalculateDetentionRequest.DetentionStartTime;
-                List<StudentDetention> result = new List<StudentDetention>();
-                source.DetentionList.ForEach(d =>
+                CalculateDetentionResponse response = new CalculateDetentionResponse { CalculateDetentionRequest = request, StudentDetentionList = new StudentDetentionList() };
+
+
+                DateTime detentionStartTime = request.DetentionStartTime;
+                detentionForOffenceList.ToList().ForEach(d =>
                 {
-                    result.Add(new StudentDetention
+                    response.StudentDetentionList.InternalList.Add(new StudentDetention
                     {
                         DetentionInHours = d.DetentionInHours,
                         DetentionStartTime = detentionStartTime,
@@ -30,9 +32,9 @@ namespace DetentionCalculator.Core
                     detentionStartTime = detentionStartTime.AddHours(d.DetentionInHours);
                 }
                 );
-                return result;
+                return response;
             }
-        return null;
+            return null;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace DetentionCalculator.Core.Entities
 {
@@ -116,6 +117,12 @@ namespace DetentionCalculator.Core.Entities
         public DateTime DateOfJoining { get; set; }
         public bool IsInService { get; set; }
     }
+    public class FacultyList : DEntityList<Faculty, IFaculty>, IDEntityList<Faculty, IFaculty>
+    {
+        public FacultyList() { }
+        public FacultyList(List<IFaculty> internalList) : base(internalList) { this.InternalList = internalList; }
+        public FacultyList(IEnumerable<IFaculty> internalList) { this.InternalList = new List<IFaculty>(internalList); }
+    }
     public interface IClassRoom : IDEntity
     {
         IStandard Standard { get; set; }
@@ -173,6 +180,12 @@ namespace DetentionCalculator.Core.Entities
         public IClassRoom ClassRoom { get; set; }
         public DateTime AcedemicYear { get; set; }
         public bool IsActive { get; set; }
+    }
+    public class StudentList : DEntityList<Student, IStudent>, IDEntityList<Student, IStudent>
+    {
+        public StudentList() : base() { }
+        public StudentList(List<IStudent> internalList) : base(internalList) { this.InternalList = internalList; }
+        public StudentList(IEnumerable<IStudent> internalList) { this.InternalList = new List<IStudent>(internalList); }
     }
     public interface IOffence : IDEntity
     {
@@ -255,6 +268,12 @@ namespace DetentionCalculator.Core.Entities
         public DateTime? DetentionActualEndTime { get; set; }
         public bool DetentionServed { get; }
     }
+    public class StudentDetentionList : DEntityList<StudentDetention, IStudentDetention>, IDEntityList<StudentDetention, IStudentDetention>
+    {
+        public StudentDetentionList() : base() { }
+        public StudentDetentionList(List<IStudentDetention> internalList) : base(internalList) { this.InternalList = internalList; }
+        public StudentDetentionList(IEnumerable<IStudentDetention> internalList) { this.InternalList = new List<IStudentDetention>(internalList); }
+    }
     public interface IRuleCalculationMode : IDEntity
     {
         RuleCalculationModeType CalculationType { get; set; }
@@ -271,7 +290,6 @@ namespace DetentionCalculator.Core.Entities
     public interface ICalculateDetentionRequest : IDEntity
     {
         IStudent Student { get; set; }
-        IEnumerable<IOffence> Offences { get; set; }
         IRuleCalculationMode RuleCalculationMode { get; set; }
         DateTime DetentionStartTime { get; set; }
         IFaculty RequestingFaculty { get; set; }
@@ -279,19 +297,34 @@ namespace DetentionCalculator.Core.Entities
     public class CalculateDetentionRequest : DEntity, ICalculateDetentionRequest
     {
         public IStudent Student { get; set; }
-        public IEnumerable<IOffence> Offences { get; set; }
         public IRuleCalculationMode RuleCalculationMode { get; set; }
         public DateTime DetentionStartTime { get; set; }
         public IFaculty RequestingFaculty { get; set; }
     }
+    public class CalculateDetentionRequestList : DEntityList<CalculateDetentionRequest, ICalculateDetentionRequest>, IDEntityList<CalculateDetentionRequest, ICalculateDetentionRequest>
+    {
+        public CalculateDetentionRequestList() : base() { }
+        public CalculateDetentionRequestList(List<ICalculateDetentionRequest> internalList) : base(internalList) { this.InternalList = internalList; }
+        public CalculateDetentionRequestList(IEnumerable<ICalculateDetentionRequest> internalList) { this.InternalList = new List<ICalculateDetentionRequest>(internalList); }
+    }
     public interface ICalculateDetentionResponse
     {
         ICalculateDetentionRequest CalculateDetentionRequest { get; set; }
-        List<IStudentDetention> DetentionList { get; set; }
+        StudentDetentionList StudentDetentionList { get; set; }
+        double DetentionPeriodInHours { get; }
     }
     public class CalculateDetentionResponse : ICalculateDetentionResponse
     {
         public ICalculateDetentionRequest CalculateDetentionRequest { get; set; }
-        public List<IStudentDetention> DetentionList { get; set; }
+        public StudentDetentionList StudentDetentionList { get; set; }
+        public double DetentionPeriodInHours
+        {
+            get
+            {
+                return this.StudentDetentionList != null && this.StudentDetentionList.InternalList.Count > 0 
+                    ? this.StudentDetentionList.InternalList.Sum(sd => sd.DetentionInHours)
+                    : 0;
+            }
+        }
     }
 }
