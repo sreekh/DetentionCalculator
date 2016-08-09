@@ -66,9 +66,10 @@ namespace DetentionCalculator.Core.Processors
               .SelectMany(x => x.GetTypes())
               .Where(x => interfaceType.IsAssignableFrom(x)
                         && !x.IsInterface
-                        && !x.IsAbstract
-                        && ((IRuleOrchestrationStrategy)x).ApplyStrategy(ruleCalculationMode))
-              .Select(x => (IRuleOrchestrationStrategy)Activator.CreateInstance(x)).OrderBy(x => x.OrchestrationOrder);
+                        && !x.IsAbstract)
+              .Select(x => (IRuleOrchestrationStrategy)Activator.CreateInstance(x))
+              .Where(s => s.ApplyStrategy(ruleCalculationMode))
+              .OrderBy(x => x.OrchestrationOrder);
         }
     }
     public interface IRuleOrchestrationStrategy

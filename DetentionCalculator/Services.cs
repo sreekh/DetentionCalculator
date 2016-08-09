@@ -1,5 +1,6 @@
 ﻿using DetentionCalculator.Core.Databases;
 using DetentionCalculator.Core.Entities;
+using DetentionCalculator.Core.Processors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 namespace DetentionCalculator.Core.Services
 {
     public interface ICRUDService<T,I>
-        where T : DEntity, new()
+        where T : DEntity, I, new()
         where I : IDEntity
     {
         IDEntityList<T,I> Get();
@@ -19,7 +20,7 @@ namespace DetentionCalculator.Core.Services
         void Delete(I entity);
     }
     public abstract class BaseCRUDService<T, I> : ICRUDService<T, I>
-        where T : DEntity, new()
+        where T : DEntity, I, new()
         where I : IDEntity
     {
         protected IRepository Repository;
@@ -86,17 +87,17 @@ namespace DetentionCalculator.Core.Services
 
         protected override void ProcessAdd(IOffence entity)
         {
-            this.Repository.OffenceList.InternalList.Add(entity);
+            this.Repository.OffenceList.Add(entity);
         }
 
         protected override void ProcessDelete(IOffence entity)
         {
-            this.Repository.OffenceList.InternalList.Remove(entity);
+            this.Repository.OffenceList.Remove(entity);
         }
 
         protected override void ProcessAddList(List<IOffence> entityList)
         {
-            this.Repository.OffenceList.InternalList.AddRange(entityList);
+            this.Repository.OffenceList.AddRange(entityList);
         }
     }
     public interface IStandardDetentionForOffenceCRUDService : ICRUDService<StandardDetentionForOffence, IStandardDetentionForOffence> { }
@@ -119,17 +120,17 @@ namespace DetentionCalculator.Core.Services
 
         protected override void ProcessDelete(IStandardDetentionForOffence entity)
         {
-            this.Repository.StandardDetentionForOffenceList.InternalList.Remove(entity);
+            this.Repository.StandardDetentionForOffenceList.Remove(entity);
         }
 
         protected override void ProcessAdd(IStandardDetentionForOffence entity)
         {
-            this.Repository.StandardDetentionForOffenceList.InternalList.Add(entity);
+            this.Repository.StandardDetentionForOffenceList.Add(entity);
         }
 
         protected override void ProcessAddList(List<IStandardDetentionForOffence> entityList)
         {
-            this.Repository.StandardDetentionForOffenceList.InternalList.AddRange(entityList);
+            this.Repository.StandardDetentionForOffenceList.AddRange(entityList);
         }
     }
     public interface IStudentCRUDService : ICRUDService<Student, IStudent> { }
@@ -141,17 +142,17 @@ namespace DetentionCalculator.Core.Services
         }
         protected override void ProcessAdd(IStudent entity)
         {
-            this.Repository.StudentList.InternalList.Add(entity);
+            this.Repository.StudentList.Add(entity);
         }
 
         protected override void ProcessDelete(IStudent entity)
         {
-            this.Repository.StudentList.InternalList.Remove(entity);
+            this.Repository.StudentList.Remove(entity);
         }
 
         protected override void ProcessAddList(List<IStudent> entityList)
         {
-            this.Repository.StudentList.InternalList.AddRange(entityList);
+            this.Repository.StudentList.AddRange(entityList);
         }
 
         protected override IDEntityList<Student, IStudent> ProcessGet()
@@ -173,17 +174,17 @@ namespace DetentionCalculator.Core.Services
         }
         protected override void ProcessAdd(IFaculty entity)
         {
-            this.Repository.FacultyList.InternalList.Add(entity);
+            this.Repository.FacultyList.Add(entity);
         }
 
         protected override void ProcessDelete(IFaculty entity)
         {
-            this.Repository.FacultyList.InternalList.Remove(entity);
+            this.Repository.FacultyList.Remove(entity);
         }
 
         protected override void ProcessAddList(List<IFaculty> entityList)
         {
-            this.Repository.FacultyList.InternalList.AddRange(entityList);
+            this.Repository.FacultyList.AddRange(entityList);
         }
 
         protected override IDEntityList<Faculty, IFaculty> ProcessGet()
@@ -209,17 +210,17 @@ namespace DetentionCalculator.Core.Services
 
         protected override void ProcessAdd(IStudentOffence entity)
         {
-            this.Repository.StudentOffenceList.InternalList.Add(entity);
+            this.Repository.StudentOffenceList.Add(entity);
         }
 
         protected override void ProcessDelete(IStudentOffence entity)
         {
-            this.Repository.StudentOffenceList.InternalList.Remove(entity);
+            this.Repository.StudentOffenceList.Remove(entity);
         }
 
         protected override void ProcessAddList(List<IStudentOffence> entityList)
         {
-            this.Repository.StudentOffenceList.InternalList.AddRange(entityList);
+            this.Repository.StudentOffenceList.AddRange(entityList);
         }
 
         protected override IDEntityList<StudentOffence, IStudentOffence> ProcessGet()
@@ -249,17 +250,17 @@ namespace DetentionCalculator.Core.Services
         }
         protected override void ProcessAdd(IStudentDetention entity)
         {
-            this.Repository.StudentDetentionList.InternalList.Add(entity);
+            this.Repository.StudentDetentionList.Add(entity);
         }
 
         protected override void ProcessDelete(IStudentDetention entity)
         {
-            this.Repository.StudentDetentionList.InternalList.Remove(entity);
+            this.Repository.StudentDetentionList.Remove(entity);
         }
 
         protected override void ProcessAddList(List<IStudentDetention> entityList)
         {
-            this.Repository.StudentDetentionList.InternalList.AddRange(entityList);
+            this.Repository.StudentDetentionList.AddRange(entityList);
         }
 
         protected override IDEntityList<StudentDetention, IStudentDetention> ProcessGet()
@@ -281,17 +282,17 @@ namespace DetentionCalculator.Core.Services
         }
         protected override void ProcessAdd(ICalculateDetentionRequest entity)
         {
-            this.Repository.CalculateDetentionRequestList.InternalList.Add(entity);
+            this.Repository.CalculateDetentionRequestList.Add(entity);
         }
 
         protected override void ProcessDelete(ICalculateDetentionRequest entity)
         {
-            this.Repository.CalculateDetentionRequestList.InternalList.Remove(entity);
+            this.Repository.CalculateDetentionRequestList.Remove(entity);
         }
 
         protected override void ProcessAddList(List<ICalculateDetentionRequest> entityList)
         {
-            this.Repository.CalculateDetentionRequestList.InternalList.AddRange(entityList);
+            this.Repository.CalculateDetentionRequestList.AddRange(entityList);
         }
 
         protected override IDEntityList<CalculateDetentionRequest, ICalculateDetentionRequest> ProcessGet()
@@ -302,6 +303,23 @@ namespace DetentionCalculator.Core.Services
         protected override ICalculateDetentionRequest ProcessGet(Guid id)
         {
             return this.Repository.CalculateDetentionRequestList.InternalList.Where(o => o.Id == id).Select(o => (ICalculateDetentionRequest)o).First();
+        }
+    }
+
+    public interface IDetentionCalculatorService
+    {
+        ICalculateDetentionResponse CalculateDetention(ICalculateDetentionRequest request);
+    }
+    public class DetentionCalculatorService : IDetentionCalculatorService
+    {
+        private IDetentionCalculator DetentionCalculator;
+        public DetentionCalculatorService(IDetentionCalculator detentionCalculator)
+        {
+            this.DetentionCalculator = detentionCalculator;
+        }
+        public ICalculateDetentionResponse CalculateDetention(ICalculateDetentionRequest request)
+        {
+            return this.DetentionCalculator.Calculate(request);
         }
     }
 }

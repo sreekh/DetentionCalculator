@@ -122,7 +122,7 @@ namespace DetentionCalculator.Core.Databases
         {
             if (this.seedDataProvider != null)
             {
-                string serializedRepository = JsonConvert.SerializeObject(this.seedDataProvider);
+                string serializedRepository = JsonConvert.SerializeObject(this.seedDataProvider, new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
                 File.WriteAllText(Path.Combine(LOCAL_FILE_DIRECTORY_PATH, LOCAL_FILE_NAME), serializedRepository);
             }
             else

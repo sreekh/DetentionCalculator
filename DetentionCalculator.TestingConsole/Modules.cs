@@ -1,10 +1,12 @@
-﻿using DetentionCalculator.Core.Databases;
+﻿using DetentionCalculator.Core;
+using DetentionCalculator.Core.Databases;
 using DetentionCalculator.Core.Entities;
 using DetentionCalculator.Core.Processors;
 using DetentionCalculator.Core.Services;
 using Ninject.Modules;
 
-namespace DetentionCalculator.Core
+
+namespace DetentionCalculator.TestingConsole
 {
     public class Modules : NinjectModule
     {

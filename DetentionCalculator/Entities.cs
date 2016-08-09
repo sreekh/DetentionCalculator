@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,18 +42,21 @@ namespace DetentionCalculator.Core.Entities
         public string ModifiedBy { get; set; }
     }
     public interface IDEntityList<T,I>
-        where T : DEntity, new()
+        where T : DEntity, I, new()
         where I : IDEntity
     {
-        List<I> InternalList { get; set; }
+        List<T> InternalList { get; set; }
+        void Remove(I entity);
+        void Add(I entity);
+        void AddRange(List<I> entityList);
     }
     public class DEntityList : List<DEntity>, IDEntityList<DEntity,IDEntity>
     {
-        private List<IDEntity> internalList;
-        public DEntityList() { }
-        public DEntityList(List<IDEntity> internalList)  { this.internalList = internalList; }
-        public DEntityList(IEnumerable<DEntity> internalList) : base(internalList){  }
-        public List<IDEntity> InternalList
+        private List<DEntity> internalList;
+        public DEntityList() { this.InternalList = new List<DEntity>(); }
+        public DEntityList(List<IDEntity> internalList) : this() { if (internalList != null) internalList.ForEach(i => this.InternalList.Add((DEntity)i)); }
+        public DEntityList(IEnumerable<IDEntity> internalList) : this(internalList.ToList()) { }
+        public List<DEntity> InternalList
         {
             get
             {
@@ -64,16 +68,32 @@ namespace DetentionCalculator.Core.Entities
                 this.internalList = value;
             }
         }
+        public void Remove(IDEntity entity)
+        {
+            if (this.InternalList != null)
+                this.InternalList.Remove((DEntity)entity);
+        }
+        public void Add(IDEntity entity)
+        {
+            if (this.InternalList != null)
+                this.InternalList.Add((DEntity)entity);
+        }
+        public void AddRange(List<IDEntity> entityList)
+        {
+            if (this.InternalList != null && entityList != null)
+                entityList.ForEach(entity => this.InternalList.Add((DEntity)entity));
+        }
     }
     public class DEntityList<T,I> : IDEntityList<T,I>
-        where T : DEntity, new()
+        where T : DEntity, I, new()
         where I : IDEntity
     {
-        private List<I> internalList;
-        public DEntityList() { this.internalList = new List<I>(); }
-        public DEntityList(List<I> internalList) { this.internalList = internalList; }
-        public DEntityList(IEnumerable<I> internalList) { this.internalList = new List<I>(internalList); }
-        public List<I> InternalList
+        private List<T> internalList;
+        public DEntityList() { this.internalList = new List<T>(); }
+        public DEntityList(List<I> internalList):this() { if (internalList != null) internalList.ForEach(i => this.InternalList.Add((T)i)); }
+        public DEntityList(IEnumerable<I> internalList):this(internalList.ToList()) { }
+
+        public List<T> InternalList
         {
             get
             {
@@ -84,6 +104,21 @@ namespace DetentionCalculator.Core.Entities
             {
                 this.internalList = value;
             }
+        }
+        public void Remove(I entity)
+        {
+            if (this.InternalList != null)
+                this.InternalList.Remove((T)entity);
+        }
+        public void Add(I entity)
+        {
+            if (this.InternalList != null)
+                this.InternalList.Add((T)entity);
+        }
+        public void AddRange(List<I> entityList)
+        {
+            if (this.InternalList != null && entityList != null)
+                entityList.ForEach(entity => this.InternalList.Add((T)entity));
         }
     }
 
@@ -95,14 +130,17 @@ namespace DetentionCalculator.Core.Entities
     }
     public interface IStudent : IDEntity
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IPerson PersonalDetails { get; set; }
         string RollNumber { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IClassRoom ClassRoom { get; set; }
         DateTime AcedemicYear { get; set; }
         bool IsActive { get; set; }
     }
     public interface IFaculty : IDEntity
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IPerson PersonalDetails { get; set; }
         string FacultyId { get; set; }
         FacultyType FacultyType { get; set; }
@@ -111,6 +149,7 @@ namespace DetentionCalculator.Core.Entities
     }
     public class Faculty : DEntity, IFaculty
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IPerson PersonalDetails { get; set; }
         public string FacultyId { get; set; }
         public FacultyType FacultyType { get; set; }
@@ -120,16 +159,18 @@ namespace DetentionCalculator.Core.Entities
     public class FacultyList : DEntityList<Faculty, IFaculty>, IDEntityList<Faculty, IFaculty>
     {
         public FacultyList() { }
-        public FacultyList(List<IFaculty> internalList) : base(internalList) { this.InternalList = internalList; }
-        public FacultyList(IEnumerable<IFaculty> internalList) { this.InternalList = new List<IFaculty>(internalList); }
+        public FacultyList(List<IFaculty> internalList) : base(internalList) {  }
+        public FacultyList(IEnumerable<IFaculty> internalList) :this(internalList.ToList()) { }
     }
     public interface IClassRoom : IDEntity
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IStandard Standard { get; set; }
         string Section { get; set; }
     }
     public class ClassRoom : DEntity, IClassRoom
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IStandard Standard { get; set; }
         public string Section { get; set; }
     }
@@ -175,8 +216,10 @@ namespace DetentionCalculator.Core.Entities
     }
     public class Student : DEntity, IStudent
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IPerson PersonalDetails { get; set; }
         public string RollNumber { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IClassRoom ClassRoom { get; set; }
         public DateTime AcedemicYear { get; set; }
         public bool IsActive { get; set; }
@@ -184,8 +227,8 @@ namespace DetentionCalculator.Core.Entities
     public class StudentList : DEntityList<Student, IStudent>, IDEntityList<Student, IStudent>
     {
         public StudentList() : base() { }
-        public StudentList(List<IStudent> internalList) : base(internalList) { this.InternalList = internalList; }
-        public StudentList(IEnumerable<IStudent> internalList) { this.InternalList = new List<IStudent>(internalList); }
+        public StudentList(List<IStudent> internalList) : base(internalList) { }
+        public StudentList(IEnumerable<IStudent> internalList) : this(internalList.ToList()) { }
     }
     public interface IOffence : IDEntity
     {
@@ -200,16 +243,18 @@ namespace DetentionCalculator.Core.Entities
     public class OffenceList : DEntityList<Offence, IOffence>, IDEntityList<Offence, IOffence>
     {
         public OffenceList() { }
-        public OffenceList(List<IOffence> internalList) : base(internalList) { this.InternalList = internalList; }
-        public OffenceList(IEnumerable<IOffence> internalList) { this.InternalList = new List<IOffence>(internalList); }
+        public OffenceList(List<IOffence> internalList) : base(internalList) { }
+        public OffenceList(IEnumerable<IOffence> internalList) : this(internalList.ToList()) { }
     }
     public interface IDetentionForOffence
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IOffence Offence { get; set; }
         double DetentionInHours { get; set; }
     }
     public class DetentionForOffence : IDetentionForOffence
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IOffence Offence { get; set; }
         public double DetentionInHours { get; set; }
     }
@@ -219,37 +264,45 @@ namespace DetentionCalculator.Core.Entities
     }
     public class StandardDetentionForOffence : DEntity, IStandardDetentionForOffence
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IOffence Offence { get; set; }
         public double DetentionInHours { get; set; }
     }
     public class StandardDetentionForOffenceList : DEntityList<StandardDetentionForOffence, IStandardDetentionForOffence>, IDEntityList<StandardDetentionForOffence, IStandardDetentionForOffence>
     {
         public StandardDetentionForOffenceList() :base() { }
-        public StandardDetentionForOffenceList(List<IStandardDetentionForOffence> internalList) : base(internalList) { this.InternalList = internalList; }
-        public StandardDetentionForOffenceList(IEnumerable<IStandardDetentionForOffence> internalList) { this.InternalList = new List<IStandardDetentionForOffence>(internalList); }
+        public StandardDetentionForOffenceList(List<IStandardDetentionForOffence> internalList) : base(internalList) { }
+        public StandardDetentionForOffenceList(IEnumerable<IStandardDetentionForOffence> internalList) : this(internalList.ToList()) { }
     }
     public interface IStudentOffence : IDEntity
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IStudent Student { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IOffence Offence { get; set; }
         DateTime OffenceTime { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IFaculty ReportingFaculty { get; set; }
     }
     public class StudentOffence : DEntity, IStudentOffence
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IStudent Student { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IOffence Offence { get; set; }
         public DateTime OffenceTime { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IFaculty ReportingFaculty { get; set; }
     }
     public class StudentOffenceList : DEntityList<StudentOffence, IStudentOffence>, IDEntityList<StudentOffence, IStudentOffence>
     {
         public StudentOffenceList() { }
-        public StudentOffenceList(List<IStudentOffence> internalList) : base(internalList) { this.InternalList = internalList; }
-        public StudentOffenceList(IEnumerable<IStudentOffence> internalList) { this.InternalList = new List<IStudentOffence>(internalList); }
+        public StudentOffenceList(List<IStudentOffence> internalList) : base(internalList) { }
+        public StudentOffenceList(IEnumerable<IStudentOffence> internalList) : this(internalList.ToList()) { }
     }
     public interface IStudentDetention : IDEntity
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IStudentOffence StudentOffence { get; set; }
         double DetentionInHours { get; set; }
         DateTime DetentionStartTime { get; set; }
@@ -260,6 +313,7 @@ namespace DetentionCalculator.Core.Entities
     }
     public class StudentDetention : DEntity, IStudentDetention
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IStudentOffence StudentOffence { get; set; }
         public double DetentionInHours { get; set; }
         public DateTime DetentionStartTime { get; set; }
@@ -271,8 +325,8 @@ namespace DetentionCalculator.Core.Entities
     public class StudentDetentionList : DEntityList<StudentDetention, IStudentDetention>, IDEntityList<StudentDetention, IStudentDetention>
     {
         public StudentDetentionList() : base() { }
-        public StudentDetentionList(List<IStudentDetention> internalList) : base(internalList) { this.InternalList = internalList; }
-        public StudentDetentionList(IEnumerable<IStudentDetention> internalList) { this.InternalList = new List<IStudentDetention>(internalList); }
+        public StudentDetentionList(List<IStudentDetention> internalList) : base(internalList) { }
+        public StudentDetentionList(IEnumerable<IStudentDetention> internalList) : this(internalList.ToList()) { }
     }
     public interface IRuleCalculationMode : IDEntity
     {
@@ -289,23 +343,29 @@ namespace DetentionCalculator.Core.Entities
     }
     public interface ICalculateDetentionRequest : IDEntity
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IStudent Student { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IRuleCalculationMode RuleCalculationMode { get; set; }
         DateTime DetentionStartTime { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         IFaculty RequestingFaculty { get; set; }
     }
     public class CalculateDetentionRequest : DEntity, ICalculateDetentionRequest
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IStudent Student { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IRuleCalculationMode RuleCalculationMode { get; set; }
         public DateTime DetentionStartTime { get; set; }
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public IFaculty RequestingFaculty { get; set; }
     }
     public class CalculateDetentionRequestList : DEntityList<CalculateDetentionRequest, ICalculateDetentionRequest>, IDEntityList<CalculateDetentionRequest, ICalculateDetentionRequest>
     {
         public CalculateDetentionRequestList() : base() { }
-        public CalculateDetentionRequestList(List<ICalculateDetentionRequest> internalList) : base(internalList) { this.InternalList = internalList; }
-        public CalculateDetentionRequestList(IEnumerable<ICalculateDetentionRequest> internalList) { this.InternalList = new List<ICalculateDetentionRequest>(internalList); }
+        public CalculateDetentionRequestList(List<ICalculateDetentionRequest> internalList) : base(internalList) { }
+        public CalculateDetentionRequestList(IEnumerable<ICalculateDetentionRequest> internalList) : this(internalList.ToList()) { }
     }
     public interface ICalculateDetentionResponse
     {
@@ -315,6 +375,7 @@ namespace DetentionCalculator.Core.Entities
     }
     public class CalculateDetentionResponse : ICalculateDetentionResponse
     {
+        [JsonProperty(TypeNameHandling = TypeNameHandling.All)]
         public ICalculateDetentionRequest CalculateDetentionRequest { get; set; }
         public StudentDetentionList StudentDetentionList { get; set; }
         public double DetentionPeriodInHours
